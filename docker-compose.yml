@@ -1,0 +1,34 @@
+services:
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    image: krizal1/backend:2.0
+    container_name: devops-backend
+    volumes:
+      - data-volume:/app
+    networks:
+      - devops-net
+    restart: always
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    image: krizal1/frontend:2.0
+    container_name: devops-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - devops-net
+    restart: always
+
+volumes:
+  data-volume:
+    driver: local
+
+networks:
+  devops-net:
+    driver: bridge
