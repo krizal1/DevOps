@@ -1,0 +1,70 @@
+---
+- name: 1. Установка зависимостей для Docker
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+      - git
+    state: present
+    update_cache: yes
+
+- name: 2. Установка Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: 3. Установка Docker Compose
+  apt:
+    name: docker-compose
+    state: present
+
+- name: 4. Добавление пользователя в группу docker
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
+
+- name: 5. Клонирование репозитория backend
+  git:
+    repo: 'https://github.com/krizal1/backend.git'
+    dest: /home/{{ ansible_user }}/backend
+    version: main
+    force: yes
+  tags:
+    - deploy
+
+- name: 6. Клонирование репозитория frontend
+  git:
+    repo: 'https://github.com/krizal1/frontend.git'
+    dest: /home/{{ ansible_user }}/frontend
+    version: main
+    force: yes
+  tags:
+    - deploy
+
+- name: 7. Клонирование репозитория DevOps
+  git:
+    repo: 'https://github.com/krizal1/DevOps.git'
+    dest: /home/{{ ansible_user }}/DevOps
+    version: main
+    force: yes
+  tags:
+    - deploy
+
+- name: 8. Запуск контейнеров через Docker Compose
+  command: docker compose up -d --build
+  args:
+    chdir: /home/{{ ansible_user }}/DevOps
+  tags:
+    - deploy
+    - up
+
+- name: 9. Остановка контейнеров через Docker Compose
+  command: docker compose down
+  args:
+    chdir: /home/{{ ansible_user }}/DevOps
+  tags:
+    - stop
+    - down
