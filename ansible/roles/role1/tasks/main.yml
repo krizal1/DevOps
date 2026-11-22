@@ -9,22 +9,30 @@
       - git
     state: present
     update_cache: yes
+  tags:
+    - deploy
 
 - name: 2. Установка Docker
   apt:
     name: docker.io
     state: present
+  tags:
+    - deploy
 
 - name: 3. Установка Docker Compose
   apt:
     name: docker-compose
     state: present
+  tags:
+    - deploy
 
 - name: 4. Добавление пользователя в группу docker
   user:
     name: "{{ ansible_user }}"
     groups: docker
     append: yes
+  tags:
+    - deploy
 
 - name: 5. Клонирование репозитория backend
   git:
@@ -54,7 +62,7 @@
     - deploy
 
 - name: 8. Запуск контейнеров через Docker Compose
-  command: docker compose up -d --build
+  command: docker-compose up -d --build
   args:
     chdir: /home/{{ ansible_user }}/DevOps
   tags:
@@ -62,7 +70,7 @@
     - up
 
 - name: 9. Остановка контейнеров через Docker Compose
-  command: docker compose down
+  command: docker-compose down
   args:
     chdir: /home/{{ ansible_user }}/DevOps
   tags:
